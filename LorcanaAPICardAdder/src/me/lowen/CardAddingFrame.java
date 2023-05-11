@@ -15,6 +15,7 @@ import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
@@ -27,21 +28,21 @@ import me.lowen.collectionpanels.MultiStringSelectionPanel;
 import me.lowen.collectionpanels.NumberCollectionPanel;
 import me.lowen.collectionpanels.SingleCollectionPanel;
 
-public class CardAddingFrame extends JFrame {
+public class CardAddingFrame extends JPanel {
 
 	private static final long serialVersionUID = -7060100486068295831L;
 	
 	SingleCollectionPanel nameC;
 	JPanel mainPanel;
 	public CardAddingFrame(CardType type) {
-		super("Add a new card: ");
+//		super("Add a new card: ");
 		try {
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 		} catch (ClassNotFoundException | InstantiationException | IllegalAccessException
 				| UnsupportedLookAndFeelException e) {
 			e.printStackTrace();
 		}
-		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+//		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		mainPanel = new JPanel();
 		mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
 		nameC = new SingleCollectionPanel("Name", "name");
@@ -79,10 +80,14 @@ public class CardAddingFrame extends JFrame {
 		buttonPanel.add(saveAndClearButton);
 		mainPanel.add(buttonPanel);
 		this.add(mainPanel);
-		this.pack();
-		this.setLocationRelativeTo(null);
+//		this.pack();
+//		this.setLocationRelativeTo(null);
 		this.setVisible(true);
 		
+	}
+	
+	public String getCardName() {
+		return nameC.getText();
 	}
 	
 	String[] colors = {"Amber", "Amethyst", "Emerald", "Ruby", "Sapphire", "Steel"};
@@ -141,13 +146,14 @@ public class CardAddingFrame extends JFrame {
 				// makes the updating slightly snappier for single digit entries. Instead of waiting for the key to be released,
 				// it will be updated quicker if it is a-z, 0-9. doesn't work for deletions or pasting
 				if (Character.isAlphabetic(e.getKeyChar()) || Character.isDigit(e.getKeyChar())) {
-				CardAddingFrame.this.setTitle(CardAddingFrame.this.getTitle() + e.getKeyChar());
+					((JFrame)SwingUtilities.getWindowAncestor(CardAddingFrame.this)).setTitle(((JFrame)SwingUtilities.getWindowAncestor(CardAddingFrame.this)).getTitle() + e.getKeyChar());
 				}
 			}
 
 			@Override
 			public void keyReleased(KeyEvent e) {
-				CardAddingFrame.this.setTitle("Add a new card: " + nameC.getText());
+			((JFrame)SwingUtilities.getWindowAncestor(CardAddingFrame.this)).setTitle("Add a new card: " + nameC.getText());
+				
 			}
 			
 		};
