@@ -19,6 +19,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import me.lowen.collectionpanels.BooleanCollectionPanel;
@@ -27,6 +28,7 @@ import me.lowen.collectionpanels.MultiKeyPairCollectionPanel;
 import me.lowen.collectionpanels.MultiStringSelectionPanel;
 import me.lowen.collectionpanels.NumberCollectionPanel;
 import me.lowen.collectionpanels.SingleCollectionPanel;
+import me.lowen.ezintegrate.EZIntegrater;
 
 public class CardAddingFrame extends JPanel {
 
@@ -34,6 +36,8 @@ public class CardAddingFrame extends JPanel {
 	
 	SingleCollectionPanel nameC;
 	JPanel mainPanel;
+	File directory = new File("C:\\Users\\jnlowen_wccnet\\Documents\\Typed Lorcana Cards\\");
+	EZIntegrater ezI;
 	public CardAddingFrame(CardType type) {
 //		super("Add a new card: ");
 		try {
@@ -42,6 +46,7 @@ public class CardAddingFrame extends JPanel {
 				| UnsupportedLookAndFeelException e) {
 			e.printStackTrace();
 		}
+		ezI = new EZIntegrater(directory);
 //		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		mainPanel = new JPanel();
 		mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
@@ -60,7 +65,7 @@ public class CardAddingFrame extends JPanel {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				CardAddingFrame.this.saveTo(new File("C:\\Users\\jnlowen_wccnet\\Documents\\Typed Lorcana Cards\\CardTest.txt"));
+				CardAddingFrame.this.saveTo(directory);
 			}
 			
 		});
@@ -69,7 +74,7 @@ public class CardAddingFrame extends JPanel {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				CardAddingFrame.this.saveTo(new File("C:\\Users\\jnlowen_wccnet\\Documents\\Typed Lorcana Cards\\CardTest.txt"));
+				CardAddingFrame.this.saveTo(directory);
 				CardAddingFrame.this.clearAllFields();
 			}
 			
@@ -95,6 +100,7 @@ public class CardAddingFrame extends JPanel {
 	
 	// I was consider making one different class for each, but I think this should work just fine
 	private void assembleForCharacter() {
+		this.addComponent(new SingleCollectionPanel("Subtitle", "subtitle"));
 		this.addComponent(new NumberCollectionPanel("Ink Cost", "ink-cost"));
 		this.addComponent(new BooleanCollectionPanel("Is Inkable", "inkable"));
 		this.addComponent(new MultiStringSelectionPanel(colors, "Color", "color"));
@@ -161,7 +167,7 @@ public class CardAddingFrame extends JPanel {
 		
 	}
 	
-	public void saveTo(File file) {
+	public void saveTo(File directoryPath) {
 		JSONObject jo = new JSONObject();
 		for (Component e : mainPanel.getComponents()) {
 			if (e instanceof SingleCollectionPanel) {
@@ -185,14 +191,23 @@ public class CardAddingFrame extends JPanel {
 				jo.put(((NumberCollectionPanel)e).getKey(), ((NumberCollectionPanel)e).getValue());
 			}
 		}
-		jo.put("image-urls", CardAdderUtils.getImagesURLs(jo.getString("name").toLowerCase().replace(" ", "_")));
+		jo.put("image-urls", CardAdderUtils.getImagesURLs(jo.getString("name").toLowerCase().replace(" ", "_") + "-" + jo.getString("subtitle").toLowerCase().replace(" ", "_")));
 		BufferedWriter br;
 		try {
-			br = new BufferedWriter(new FileWriter(file));
+			try {
+			br = new BufferedWriter(new FileWriter(directoryPath + System.getProperty("file.separator") + jo.getString("name").toLowerCase().replace(" ", "_") 
+					+ "-" + jo.getString("subtitle").toLowerCase().replace(" ", "_") +".txt"));
 			jo.write(br, 2, 2);
 			br.close();
+			System.out.println("f");
+			ezI.integrateJSONObject(jo);
+			} catch (JSONException e) {
+				e.printStackTrace();
+				br = new BufferedWriter(new FileWriter(directoryPath + System.getProperty("file.separator") + jo.getString("name").toLowerCase().replace(" ", "_") + ".txt"));
+				jo.write(br, 2, 2);
+				br.close();
+			}
 		} catch (IOException e1) {
-			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
 		

@@ -1,8 +1,8 @@
 package me.lowen;
 
 import javax.swing.JFrame;
+import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
-import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.event.ChangeEvent;
@@ -45,17 +45,21 @@ public class MainFrame extends JFrame {
 			public void stateChanged(ChangeEvent e) {
 				
 				
-					MainFrame.this.pack();
-
 				
 				MainFrame.this.setTitle("Add a new card: " + ((CardAddingFrame)pane.getSelectedComponent()).getCardName());
 				
-			}
-
 			
+			}
 			
 		};
 		return jim;
 	}
+	
 
+}
+
+class ChooseOnePanel extends JPanel {
+
+	private static final long serialVersionUID = -5267966816819754555L;
+	
 }
