@@ -78,6 +78,8 @@ public class MultiCollectionPanel extends JPanel {
 	public ArrayList<String> getAllTextAsArrayList() {
 		ArrayList<String> texts = new ArrayList<String>();
 		for (JTextField field: fields) {
+			if (field.getText() == null || field.getText().isBlank())
+				continue;
 			texts.add(field.getText());
 		}
 		return texts;

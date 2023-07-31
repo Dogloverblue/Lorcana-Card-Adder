@@ -93,6 +93,8 @@ public class MultiKeyPairCollectionPanel extends JPanel{
 	public HashMap<String, String> getValuesAsHashMap() {
 		HashMap<String, String> mapToReturn = new HashMap<>();
 		for (KeyPairCollectionPanel kpcp: fields) {
+			if (kpcp.getValue() == null || kpcp.getValue().isBlank())
+				continue;
 			mapToReturn.put(kpcp.getKeyForKeyValuePair(), kpcp.getValue());
 		}
 		return mapToReturn;
