@@ -2,6 +2,7 @@ package me.lowen;
 
 
 import java.awt.Component;
+import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -13,8 +14,10 @@ import java.io.IOException;
 
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
@@ -36,7 +39,7 @@ public class CardAddingFrame extends JPanel {
 	
 	SingleCollectionPanel nameC;
 	JPanel mainPanel;
-	File directory = new File("C:\\Users\\jnlowen_wccnet\\Documents\\Typed Lorcana Cards\\");
+	File directory;
 	EZIntegrater ezI;
 	public CardAddingFrame(CardType type) {
 //		super("Add a new card: ");
@@ -46,7 +49,7 @@ public class CardAddingFrame extends JPanel {
 				| UnsupportedLookAndFeelException e) {
 			e.printStackTrace();
 		}
-		ezI = new EZIntegrater(directory);
+//		ezI = new EZIntegrater(directory);
 //		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		mainPanel = new JPanel();
 		mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
@@ -60,11 +63,37 @@ public class CardAddingFrame extends JPanel {
 		} else {
 			assembleForNotCharacter();
 		}
+		JPanel directoryChooserPanel = new JPanel();
+		directoryChooserPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
+		JTextField fileBox = new JTextField();
+		fileBox.setText(SettingsManager.getSavePath());
+		JButton directoryButton = new JButton("Choose Path");
+		directoryButton.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				JFileChooser jfc = new JFileChooser();
+				jfc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+				int fileCode = jfc.showSaveDialog(null);
+				if (fileCode == JFileChooser.APPROVE_OPTION) {
+					SettingsManager.setSavePath(jfc.getSelectedFile().getAbsolutePath());
+					fileBox.setText(jfc.getSelectedFile().getAbsolutePath());
+					directory = jfc.getSelectedFile();
+					SwingUtilities.getWindowAncestor(mainPanel).pack();
+					}
+				
+			}
+		});
+		directoryChooserPanel.add(fileBox);
+		directoryChooserPanel.add(directoryButton);
+		mainPanel.add(directoryChooserPanel);
+		
 		JButton saveButton = new JButton("Save");
 		saveButton.addActionListener(new ActionListener() {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
+				directory = new File(fileBox.getText());
 				CardAddingFrame.this.saveTo(directory);
 			}
 			
@@ -168,6 +197,7 @@ public class CardAddingFrame extends JPanel {
 	}
 	
 	public void saveTo(File directoryPath) {
+		ezI = new EZIntegrater(directoryPath);
 		JSONObject jo = new JSONObject();
 		for (Component e : mainPanel.getComponents()) {
 			if (e instanceof SingleCollectionPanel) {
@@ -199,7 +229,6 @@ public class CardAddingFrame extends JPanel {
 					+ "-" + jo.getString("subtitle").toLowerCase().replace(" ", "_") +".txt"));
 			jo.write(br, 2, 2);
 			br.close();
-			System.out.println("f");
 			ezI.integrateJSONObject(jo);
 			} catch (JSONException e) {
 				e.printStackTrace();
