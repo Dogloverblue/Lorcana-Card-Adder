@@ -10,21 +10,29 @@ import java.nio.file.Paths;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+/**
+ * A class for easily integrating new card JSON data into a directory of existing data
+ * @author jnlowen_wccnet
+ *
+ */
+
 public class EZIntegrater {
 
 	private File directory;
+	/**
+	 * 
+	 * @param directory The directory with the existing card data
+	 */
 	public EZIntegrater(File directory) {
 		this.directory = directory;
 	}
 	
 	public void integrateJSONObject(JSONObject jo) {
 		String nameToLookFor = jo.getString("name").toLowerCase().replace(" ", "_");
-		System.out.println("can we get much higher?");
 		boolean found = false;
 		for (File file : directory.listFiles()) {
 			try {
 				if (file.getName().equalsIgnoreCase(nameToLookFor + ".txt")) {
-					System.out.println("flound was true");
 					found = true;
 					JSONObject jo2 = new JSONObject(Files.readString(Paths.get(file.getAbsolutePath())));
 					jo2.put(jo.getString("subtitle").toLowerCase().replace(" ", "_"), jo);
@@ -44,7 +52,6 @@ public class EZIntegrater {
 		}
 		// If a file doesn't already exist, create one
 		if (found == false) {
-			System.out.println("Found was flase");
 			File file = new File(directory + System.getProperty("file.separator") + jo.getString("name").toLowerCase().replace(" ", "_") + ".txt");
 			JSONObject jo2 = new JSONObject();
 			
@@ -58,6 +65,7 @@ public class EZIntegrater {
 					jo.write(br, 2, 2);
 				}
 				br.close();
+				System.out.println("Created " + file.getName());
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
