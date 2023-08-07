@@ -41,6 +41,8 @@ public class CardAddingFrame extends JPanel {
 	JPanel mainPanel;
 	File directory;
 	EZIntegrater ezI;
+	CardType type;
+	SingleCollectionPanel typePanel = null;
 	public CardAddingFrame(CardType type) {
 //		super("Add a new card: ");
 		try {
@@ -49,6 +51,12 @@ public class CardAddingFrame extends JPanel {
 				| UnsupportedLookAndFeelException e) {
 			e.printStackTrace();
 		}
+		try {
+			directory = new File(SettingsManager.getSavePath());
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		this.type = type;
 //		ezI = new EZIntegrater(directory);
 //		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		mainPanel = new JPanel();
@@ -105,6 +113,10 @@ public class CardAddingFrame extends JPanel {
 			public void actionPerformed(ActionEvent e) {
 				CardAddingFrame.this.saveTo(directory);
 				CardAddingFrame.this.clearAllFields();
+				inkable.setSelected(true);
+				if (typePanel != null) {
+					typePanel.setText("Character");
+				}
 			}
 			
 		});
@@ -127,14 +139,16 @@ public class CardAddingFrame extends JPanel {
 	String[] colors = {"Amber", "Amethyst", "Emerald", "Ruby", "Sapphire", "Steel"};
 	String[] rarities = {"Common", "Uncommon", "Rare", "Super Rare", "Legendary"};
 	
+	BooleanCollectionPanel inkable = new BooleanCollectionPanel("Is Inkable", "inkable");
 	// I was consider making one different class for each, but I think this should work just fine
 	private void assembleForCharacter() {
 		this.addComponent(new SingleCollectionPanel("Subtitle", "subtitle"));
 		this.addComponent(new NumberCollectionPanel("Ink Cost", "ink-cost"));
-		this.addComponent(new BooleanCollectionPanel("Is Inkable", "inkable"));
+		inkable.setSelected(true);
+		this.addComponent(inkable);
 		this.addComponent(new MultiStringSelectionPanel(colors, "Color", "color"));
 		this.addComponent(new NumberCollectionPanel("Lore Amount", "lore-value"));
-		SingleCollectionPanel typePanel = new SingleCollectionPanel("Type", "type");
+		typePanel = new SingleCollectionPanel("Type", "type");
 		typePanel.setText("Character");
 		this.addComponent(typePanel);
 		this.addComponent(new MultiCollectionPanel("Subtypes", 3, "subtypes"));
@@ -152,7 +166,8 @@ public class CardAddingFrame extends JPanel {
 	}
 	private void assembleForNotCharacter() {
 		this.addComponent(new NumberCollectionPanel("Ink Cost", "ink-cost"));
-		this.addComponent(new BooleanCollectionPanel("Is Inkable", "inkable"));
+		inkable.setSelected(true);
+		this.addComponent(inkable);
 		this.addComponent(new MultiStringSelectionPanel(colors, "Color", "color"));
 		this.addComponent(new SingleCollectionPanel("Type", "type"));
 		this.addComponent(new SingleCollectionPanel("Effect", "effect"));
@@ -221,18 +236,20 @@ public class CardAddingFrame extends JPanel {
 				jo.put(((NumberCollectionPanel)e).getKey(), ((NumberCollectionPanel)e).getValue());
 			}
 		}
-		jo.put("image-urls", CardAdderUtils.getImagesURLs(jo.getString("name").toLowerCase().replace(" ", "_") + "-" + jo.getString("subtitle").toLowerCase().replace(" ", "_")));
+		
 		BufferedWriter br;
 		try {
 			try {
 			br = new BufferedWriter(new FileWriter(directoryPath + System.getProperty("file.separator") + jo.getString("name").toLowerCase().replace(" ", "_") 
 					+ "-" + jo.getString("subtitle").toLowerCase().replace(" ", "_") +".txt"));
+			jo.put("image-urls", CardAdderUtils.getImagesURLs(jo.getString("name").toLowerCase().replace(" ", "_") + "-" + jo.getString("subtitle").toLowerCase().replace(" ", "_")));
 			jo.write(br, 2, 2);
 			br.close();
 			ezI.integrateJSONObject(jo);
 			} catch (JSONException e) {
-				e.printStackTrace();
+//				e.printStackTrace();
 				br = new BufferedWriter(new FileWriter(directoryPath + System.getProperty("file.separator") + jo.getString("name").toLowerCase().replace(" ", "_") + ".txt"));
+				jo.put("image-urls", CardAdderUtils.getImagesURLs(jo.getString("name").toLowerCase().replace(" ", "_")));
 				jo.write(br, 2, 2);
 				br.close();
 			}
@@ -267,5 +284,7 @@ public class CardAddingFrame extends JPanel {
 		}
 		
 	}
+	
+	
 
 }
