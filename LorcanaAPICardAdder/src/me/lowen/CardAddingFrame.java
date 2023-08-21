@@ -242,14 +242,14 @@ public class CardAddingFrame extends JPanel {
 			try {
 			br = new BufferedWriter(new FileWriter(directoryPath + System.getProperty("file.separator") + jo.getString("name").toLowerCase().replace(" ", "_") 
 					+ "-" + jo.getString("subtitle").toLowerCase().replace(" ", "_") +".txt"));
-			jo.put("image-urls", CardAdderUtils.getImagesURLs(jo.getString("name").toLowerCase().replace(" ", "_") + "-" + jo.getString("subtitle").toLowerCase().replace(" ", "_")));
+			jo.put("image-urls", CardAdderUtils.getImagesURLsForCharacter(jo.getString("name").toLowerCase().replace(" ", "_"), jo.getString("subtitle").toLowerCase().replace(" ", "_")));
 			jo.write(br, 2, 2);
 			br.close();
 			ezI.integrateJSONObject(jo);
 			} catch (JSONException e) {
 //				e.printStackTrace();
 				br = new BufferedWriter(new FileWriter(directoryPath + System.getProperty("file.separator") + jo.getString("name").toLowerCase().replace(" ", "_") + ".txt"));
-				jo.put("image-urls", CardAdderUtils.getImagesURLs(jo.getString("name").toLowerCase().replace(" ", "_")));
+				jo.put("image-urls", CardAdderUtils.getImagesURLsForNonCharacter(jo.getString("name").toLowerCase().replace(" ", "_")));
 				jo.write(br, 2, 2);
 				br.close();
 			}
